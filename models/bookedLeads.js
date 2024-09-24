@@ -24,21 +24,27 @@ const bookedLeadSchema = new mongoose.Schema({
     },
     phone: {
         type: String,
+        default: null,  // Default to null if not provided
     },
     date: {
         type: Date,
+        default: Date.now, // Default to current date if not provided
     },
     time: {
         type: String,
+        default: null,  // Default to null if not provided
     },
     zone: {
         type: String,
+        default: 'UTC', // Default to UTC if not provided
     },
     message: {
         type: String,
+        default: '', // Default to empty string if not provided
     },
     leadSource: {
         type: String,
+        default: 'Unknown', // Default to 'Unknown' if not provided
     },
     status: {
         type: String,
@@ -54,6 +60,7 @@ const bookedLeadSchema = new mongoose.Schema({
     },
     updatedAt: {
         type: Date,
+        default: null,  // Default to null if not updated
     }
 });
 

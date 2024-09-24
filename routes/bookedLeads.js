@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const BookedLead = require('../models/bookedLeads');
+const { BookedLead } = require('../models/bookedLeads'); // Ensure you destructure to get the model
 
 // Create a new booked lead
 router.post('/add', async (req, res) => {
@@ -14,16 +14,17 @@ router.post('/add', async (req, res) => {
         const newLead = new BookedLead({
             name,
             email,
-            phone,
-            date,
-            time,
-            zone,
-            message,
-            leadSource
+            phone: phone || null, // Set to null if not provided
+            date: date || null,
+            time: time || null,
+            zone: zone || null,
+            message: message || null,
+            leadSource: leadSource || 'Unknown' // Default value
         });
         await newLead.save();
         res.status(201).json(newLead);
     } catch (error) {
+        console.error('Error creating booked lead:', error); // Log the error for debugging
         res.status(500).json({ error: 'Error creating booked lead' });
     }
 });
@@ -38,12 +39,14 @@ router.put('/update/:id', async (req, res) => {
             return res.status(404).json({ message: 'Lead not found' });
         }
 
-        lead.status = status || lead.status;
-        lead.remarks = remarks || lead.remarks;
+        // Use nullish coalescing to preserve existing values if not provided
+        lead.status = status ?? lead.status;
+        lead.remarks = remarks ?? lead.remarks;
         Object.assign(lead, otherFields);  // Update any other fields
         await lead.save();
         res.status(200).json({ message: 'Lead updated', lead });
     } catch (error) {
+        console.error('Error updating booked lead:', error); // Log the error for debugging
         res.status(500).json({ error: 'Error updating booked lead' });
     }
 });
@@ -51,9 +54,13 @@ router.put('/update/:id', async (req, res) => {
 // Delete a booked lead by ID
 router.delete('/delete/:id', async (req, res) => {
     try {
-        await BookedLead.findByIdAndDelete(req.params.id);
+        const lead = await BookedLead.findByIdAndDelete(req.params.id);
+        if (!lead) {
+            return res.status(404).json({ message: 'Lead not found' });
+        }
         res.status(200).json({ message: 'Lead deleted successfully' });
     } catch (error) {
+        console.error('Error deleting booked lead:', error); // Log the error for debugging
         res.status(500).json({ error: 'Error deleting booked lead' });
     }
 });
@@ -64,6 +71,7 @@ router.get('/all', async (req, res) => {
         const leads = await BookedLead.find();
         res.status(200).json(leads);
     } catch (error) {
+        console.error('Error fetching leads:', error); // Log the error for debugging
         res.status(500).json({ error: 'Error fetching leads' });
     }
 });
