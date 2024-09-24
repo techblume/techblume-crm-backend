@@ -13,6 +13,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    role: {
+        type: String,
+        enum: ['Techblume_Admin', 'Techblume_User'],
+        required: true,
+    },
 });
 
 // Hash the password before saving
