@@ -86,4 +86,21 @@ router.post('/users', adminAuth, async (req, res) => {
     }
 });
 
+// Route to get specific user details by email
+router.get('/user/:email', async (req, res) => {
+    const { email } = req.params;
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        res.status(200).json(user);  // Return the user details
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
 module.exports = router;
