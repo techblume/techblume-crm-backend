@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const leadSchema = new mongoose.Schema({
   leadId: {
     type: Number,
-    unique: true
+    unique: true,
+    required: true // Ensure leadId is mandatory
   },
   name: {
     type: String,
@@ -11,7 +12,11 @@ const leadSchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true
+    required: true,
+    validate: {
+      validator: (v) => /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(v), // Basic email validation
+      message: (props) => `${props.value} is not a valid email!`
+    }
   },
   phone: {
     type: String,
@@ -51,14 +56,18 @@ const leadSchema = new mongoose.Schema({
   },
   updatedAt: {
     type: Date,
-    default: function() {
-      return this.bookedDate;
-    }
+    default: Date.now // Default to current time on creation
   },
   updatedBy: {
     type: String,
     default: 'No update' // Default value if no updates have been made
   }
+});
+
+// Middleware to update the updatedAt field before saving
+leadSchema.pre('save', function (next) {
+  this.updatedAt = Date.now(); // Update updatedAt field on every save
+  next();
 });
 
 const Lead = mongoose.model('Lead', leadSchema);
